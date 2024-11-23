@@ -1,0 +1,24 @@
+[
+  {
+    "id": "2336d9e0-a587-11ef-91f2-4b7d94b7ee97",
+    "username": "GG",
+    "age": 14,
+    "hobbies": [
+      "ride a bike"
+    ]
+  },
+  {
+    "id": "2",
+    "username": "Joe",
+    "age": 80,
+    "hobbies": []
+  },
+  {
+    "id": "dec9aff0-a804-11ef-8f59-8f835f0d1dc0",
+    "username": "Pepe",
+    "age": 22,
+    "hobbies": [
+      "ride a bike"
+    ]
+  }
+]
