@@ -1,7 +1,7 @@
-type User = {
+interface User {
   id: string;
   username: string;
   age: number;
-  hobbies: Array<string> | [];
+  hobbies: Array<string>;
 };
 export default User;

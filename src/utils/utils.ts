@@ -1,4 +1,6 @@
-import User from "../../types/user.ts";
+import { IncomingMessage, ServerResponse } from "http";
+import User from "../types/user.ts";
+import { parse } from "url";
 
 export function isUuid(userId: string) {
   const uuidv1Regex =
@@ -6,9 +8,37 @@ export function isUuid(userId: string) {
   const result = userId.match(uuidv1Regex);
   return result;
 }
-// //write universal that's checks if data is correct and all data has true property
 
-export function validateUser(user: User): {isValid:boolean, errors: string[]} {
+export function incorrectPath(res: ServerResponse) {
+  res.writeHead(404, { "Content-Type": "application/json" });
+  res.statusMessage = "Incorrect path. path starts with: /api/users";
+  return res.end(JSON.stringify(res.statusMessage));
+}
+
+export function getDataFromReq(req: IncomingMessage): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let data = "";
+    req.on("data", (chunk) => {
+      data += chunk;
+    });
+    req.on("end", () => {
+      resolve(data);
+    });
+    req.on("error", (error) => {
+      reject(error);
+    });
+  });
+}
+
+export function getPathName(req: IncomingMessage) {
+  const parsedUrl = parse(req.url || "", true);
+  return parsedUrl?.pathname || null;
+}
+
+export function validateUser(user: User): {
+  isValid: boolean;
+  errors: string[];
+} {
   const allowAndRequiredFields = ["username", "age", "hobbies"];
   const errors: string[] = [];
   const extraFields = Object.keys(user).filter(
@@ -39,7 +69,7 @@ export function validateUser(user: User): {isValid:boolean, errors: string[]} {
   ) {
     errors.push("Field 'hobbies' must be an array of strings.");
   }
- const isValid: boolean = errors.length === 0 ? true : false;
+  const isValid: boolean = errors.length === 0 ? true : false;
   return {
     isValid: isValid,
     errors: errors,

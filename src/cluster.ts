@@ -4,6 +4,9 @@ import "dotenv/config";
 import App from "./app.ts";
 import http from 'node:http'
 import * as url from "url";
+import { UserController } from "./controllers/userController.ts";
+import { UserService } from "./service/userService.ts";
+import { UserRepository } from "./repository/userRepository.ts";
 
 
 if (cluster.isPrimary) {
@@ -14,7 +17,8 @@ if (cluster.isPrimary) {
 
 //should send messages throu http
 function primaryProcess() {
-  const server = new App(Number(process.env.PORT));
+  const userController = new UserController(new UserService( new UserRepository))
+  const server = new App(Number(process.env.PORT),userController);
   server.start();
   const workers : Worker [] = [];
   for (let i = 0; i < os.availableParallelism(); i++) {
@@ -44,8 +48,8 @@ function childProcess() {
     console.error("Worker port is not defined!");
     process.exit(1);
   }
-  process.on('message', (message:any) => {
-  const server = new App(port);
+
+  const server = new App(port, new UserController(new UserService(new UserRepository())));
   server.start();
-});
+
 }
