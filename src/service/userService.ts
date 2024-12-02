@@ -2,19 +2,23 @@ import User from "../types/user.ts";
 import { UserRepository } from "../repository/userRepository.ts";
 
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+  private userRepository: UserRepository;
+
+  constructor() {
+    this.userRepository = new UserRepository();
+  }
   public async deleteUser(userId: string) {
     return await this.userRepository.deleteUser(userId);
   }
 
-  public getUsers(): User[] {
-    return this.userRepository.getUsers();
+  public async getUsers() {
+    return await this.userRepository.getUsers();
   }
 
-  public getUserById(userId: string): User | void {
-    const user = this.userRepository.getUserById(userId);
-    if (!user) {
-      throw new Error("User not found");
+  public async getUserById(userId: string): Promise<User | void> {
+    const user = await this.userRepository.getUserById(userId);
+    if (user == undefined) {
+      throw new Error("User with this ID doesn't exists");
     }
     return user;
   }
@@ -24,7 +28,7 @@ export class UserService {
     age: number,
     hobbies: string[] | []
   ): Promise<User> {
-    return this.userRepository.postUser(username, age, hobbies);
+    return await this.userRepository.postUser(username, age, hobbies);
   }
 
   public async putUser(updateData: User): Promise<User | null> {

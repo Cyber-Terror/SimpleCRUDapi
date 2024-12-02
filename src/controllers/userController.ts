@@ -9,20 +9,21 @@ import {
 import User from "../types/user.ts";
 
 export class UserController {
-  constructor(private userService: UserService) {}
+  private userService: UserService;
+  constructor() {
+    this.userService = new UserService();
+  }
 
   public async requestHandler(req: IncomingMessage, res: ServerResponse) {
     const method = req.method;
     const pathname = getPathName(req) || "";
     const pathSegments = pathname.split("/");
-    console.log(pathSegments);
-    
     switch (method) {
       case "GET":
         if (pathSegments.length === 3) {
-          this.getUsers(res);
+          await this.getUsers(res);
         } else if (pathSegments.length === 4) {
-          this.getUserById(req, res);
+          await this.getUserById(req, res);
         } else {
           res.writeHead(404, { "Content-Type": "application/json" });
           res.statusMessage =
@@ -68,9 +69,9 @@ export class UserController {
     }
   }
 
-  public getUsers(res: ServerResponse): ServerResponse {
+  public async getUsers(res: ServerResponse): Promise<ServerResponse> {
     try {
-      const users = this.userService.getUsers();
+      const users = await this.userService.getUsers();
       res.writeHead(200, { "Content-type": "application/json" });
       return res.end(JSON.stringify(users));
     } catch (error) {
@@ -79,10 +80,10 @@ export class UserController {
     }
   }
 
-  public getUserById(
+  public async getUserById(
     req: IncomingMessage,
     res: ServerResponse
-  ): ServerResponse {
+  ): Promise<ServerResponse> {
     try {
       const pathname = getPathName(req) || "";
       const userId = pathname.split("/")[3];
@@ -91,17 +92,15 @@ export class UserController {
         res.statusMessage = "User ID is not valid";
         return res.end(JSON.stringify({ error: res.statusMessage }));
       }
-      const user = this.userService.getUserById(userId);
-      if (!user) {
-        throw Error;
-      }
+
+      const user = await this.userService.getUserById(userId);
       res.writeHead(200, { "Content-Type": "application/json" });
       return res.end(JSON.stringify(user));
     } catch (error) {
-      res.writeHead(404, { "Contetn-Type": "application/json" });
-      res.statusMessage = "User with this ID doesn't exists";
+      console.error("Error in getUserById:", error);
+      res.writeHead(404, { "Content-Type": "application/json" });
       return res.end(
-        JSON.stringify({ error: error, errorMessage: res.statusMessage })
+        JSON.stringify({ message: "User with this ID doesn't exists" })
       );
     }
   }
@@ -156,7 +155,7 @@ export class UserController {
         res.writeHead(400, { "Content-Type": "application/json" });
         return res.end(JSON.stringify(validatedData.errors));
       }
-      const user = this.userService.getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       if (!user) {
         throw Error;
       }
@@ -189,7 +188,7 @@ export class UserController {
         res.statusMessage = "User ID is not valid";
         return res.end(JSON.stringify({ error: res.statusMessage }));
       }
-      const user = this.userService.getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       if (!user) {
         throw Error;
       }

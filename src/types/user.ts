@@ -3,5 +3,5 @@ interface User {
   username: string;
   age: number;
   hobbies: Array<string>;
-};
+}
 export default User;

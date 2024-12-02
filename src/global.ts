@@ -1,1 +1,1 @@
-export const pathToDB = 'database.json';
+export const pathToDB = "database.json";

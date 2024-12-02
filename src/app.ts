@@ -5,10 +5,12 @@ import { UserController } from "./controllers/userController.ts";
 export default class App {
   private port: number;
   private server: http.Server;
+  private userController: UserController;
 
-  constructor(port: number, private userController: UserController) {
+  constructor(port: number) {
     this.port = port;
     this.server = http.createServer(this.requestHandler.bind(this));
+    this.userController = new UserController();
   }
 
   private async requestHandler(
