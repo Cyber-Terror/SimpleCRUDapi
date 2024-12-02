@@ -6,7 +6,8 @@
   "scripts": {
     "start:multi": "nodemon --ignore database.json --exec node --loader ts-node/esm src/cluster.ts",
     "start:dev": "nodemon --ignore database.json --exec node --loader ts-node/esm src/index.ts",
-    "start": "nodemon index.js",
+    "build":"tsc -p .",
+    "start:prod": "npx tsx ./src/index.ts",
     "test": "jest"
   },
   "nodemonConfig": {
